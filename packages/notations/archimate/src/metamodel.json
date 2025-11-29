@@ -1,0 +1,407 @@
+{
+  "id": "archimate",
+  "name": "ArchiMate 3.2",
+  "version": "3.2",
+  "layers": [
+    {
+      "id": "strategy",
+      "name": "Strategy",
+      "color": "#F5E6A3"
+    },
+    {
+      "id": "business",
+      "name": "Business",
+      "color": "#FFFFB5"
+    },
+    {
+      "id": "application",
+      "name": "Application",
+      "color": "#B5FFFF"
+    },
+    {
+      "id": "technology",
+      "name": "Technology",
+      "color": "#C9E7B7"
+    },
+    {
+      "id": "physical",
+      "name": "Physical",
+      "color": "#C9E7B7"
+    },
+    {
+      "id": "implementation",
+      "name": "Implementation & Migration",
+      "color": "#FFE0E0"
+    },
+    {
+      "id": "composite",
+      "name": "Composite",
+      "color": "#E0E0E0"
+    }
+  ],
+  "elementTypes": [
+    {
+      "id": "archimate:BusinessActor",
+      "name": "Business Actor",
+      "layer": "business",
+      "aspect": "active",
+      "shape": "actor",
+      "documentation": "A business entity that is capable of performing behavior."
+    },
+    {
+      "id": "archimate:BusinessRole",
+      "name": "Business Role",
+      "layer": "business",
+      "aspect": "active",
+      "shape": "role",
+      "documentation": "The responsibility for performing specific behavior, to which an actor can be assigned."
+    },
+    {
+      "id": "archimate:BusinessProcess",
+      "name": "Business Process",
+      "layer": "business",
+      "aspect": "behavior",
+      "shape": "process",
+      "documentation": "A sequence of business behaviors that achieves a specific result."
+    },
+    {
+      "id": "archimate:BusinessFunction",
+      "name": "Business Function",
+      "layer": "business",
+      "aspect": "behavior",
+      "shape": "function",
+      "documentation": "A collection of business behavior based on a chosen set of criteria."
+    },
+    {
+      "id": "archimate:BusinessEvent",
+      "name": "Business Event",
+      "layer": "business",
+      "aspect": "behavior",
+      "shape": "event",
+      "documentation": "An organizational state change."
+    },
+    {
+      "id": "archimate:BusinessService",
+      "name": "Business Service",
+      "layer": "business",
+      "aspect": "behavior",
+      "shape": "service",
+      "documentation": "An explicitly defined exposed business behavior."
+    },
+    {
+      "id": "archimate:BusinessObject",
+      "name": "Business Object",
+      "layer": "business",
+      "aspect": "passive",
+      "shape": "object",
+      "documentation": "A concept used within a particular business domain."
+    },
+    {
+      "id": "archimate:ApplicationComponent",
+      "name": "Application Component",
+      "layer": "application",
+      "aspect": "active",
+      "shape": "component",
+      "documentation": "An encapsulation of application functionality aligned to implementation structure."
+    },
+    {
+      "id": "archimate:ApplicationInterface",
+      "name": "Application Interface",
+      "layer": "application",
+      "aspect": "active",
+      "shape": "interface",
+      "documentation": "A point of access where application services are made available to a user, another application component, or a node."
+    },
+    {
+      "id": "archimate:ApplicationService",
+      "name": "Application Service",
+      "layer": "application",
+      "aspect": "behavior",
+      "shape": "service",
+      "documentation": "An explicitly defined exposed application behavior."
+    },
+    {
+      "id": "archimate:DataObject",
+      "name": "Data Object",
+      "layer": "application",
+      "aspect": "passive",
+      "shape": "object",
+      "documentation": "Data structured for automated processing."
+    },
+    {
+      "id": "archimate:Node",
+      "name": "Node",
+      "layer": "technology",
+      "aspect": "active",
+      "shape": "node",
+      "documentation": "A computational or physical resource that hosts, manipulates, or interacts with other computational or physical resources."
+    },
+    {
+      "id": "archimate:Device",
+      "name": "Device",
+      "layer": "technology",
+      "aspect": "active",
+      "shape": "device",
+      "documentation": "A physical IT resource upon which system software and artifacts may be stored or deployed for execution."
+    },
+    {
+      "id": "archimate:SystemSoftware",
+      "name": "System Software",
+      "layer": "technology",
+      "aspect": "active",
+      "shape": "system-software",
+      "documentation": "Software that provides or contributes to an environment for storing, executing, and using software or data."
+    },
+    {
+      "id": "archimate:TechnologyInterface",
+      "name": "Technology Interface",
+      "layer": "technology",
+      "aspect": "active",
+      "shape": "interface",
+      "documentation": "A point of access where technology services offered by a node can be accessed."
+    },
+    {
+      "id": "archimate:CommunicationNetwork",
+      "name": "Communication Network",
+      "layer": "technology",
+      "aspect": "active",
+      "shape": "network",
+      "documentation": "A set of structures that connects nodes for transmission, routing, and reception of data."
+    },
+    {
+      "id": "archimate:TechnologyService",
+      "name": "Technology Service",
+      "layer": "technology",
+      "aspect": "behavior",
+      "shape": "service",
+      "documentation": "An explicitly defined exposed technology behavior."
+    },
+    {
+      "id": "archimate:Artifact",
+      "name": "Artifact",
+      "layer": "technology",
+      "aspect": "passive",
+      "shape": "artifact",
+      "documentation": "A piece of data that is used or produced in a software development process, or by deployment and operation of an IT system."
+    },
+    {
+      "id": "archimate:Grouping",
+      "name": "Grouping",
+      "layer": "composite",
+      "aspect": "passive",
+      "shape": "grouping",
+      "documentation": "Aggregates or composes concepts that belong together based on some common characteristic."
+    },
+    {
+      "id": "archimate:Location",
+      "name": "Location",
+      "layer": "composite",
+      "aspect": "passive",
+      "shape": "location",
+      "documentation": "A place or position where structure elements can be located or behavior can be performed."
+    }
+  ],
+  "relationshipTypes": [
+    {
+      "id": "archimate:Composition",
+      "name": "Composition",
+      "lineStyle": "solid",
+      "sourceArrow": "diamond-filled",
+      "targetArrow": "none",
+      "documentation": "Indicates that an element consists of one or more other concepts.",
+      "validConnections": "structural"
+    },
+    {
+      "id": "archimate:Aggregation",
+      "name": "Aggregation",
+      "lineStyle": "solid",
+      "sourceArrow": "diamond-hollow",
+      "targetArrow": "none",
+      "documentation": "Indicates that an element combines one or more other concepts.",
+      "validConnections": "structural"
+    },
+    {
+      "id": "archimate:Assignment",
+      "name": "Assignment",
+      "lineStyle": "solid",
+      "sourceArrow": "circle-filled",
+      "targetArrow": "circle-hollow",
+      "documentation": "Links active elements with units of behavior that are performed by them, or roles that are fulfilled by them.",
+      "validConnections": [
+        { "source": "archimate:BusinessActor", "target": "archimate:BusinessRole" },
+        { "source": "archimate:BusinessRole", "target": "archimate:BusinessProcess" },
+        { "source": "archimate:BusinessRole", "target": "archimate:BusinessFunction" },
+        { "source": "archimate:ApplicationComponent", "target": "archimate:ApplicationService" },
+        { "source": "archimate:ApplicationComponent", "target": "archimate:ApplicationInterface" },
+        { "source": "archimate:Node", "target": "archimate:SystemSoftware" },
+        { "source": "archimate:Node", "target": "archimate:Artifact" },
+        { "source": "archimate:Device", "target": "archimate:SystemSoftware" },
+        { "source": "archimate:Device", "target": "archimate:Artifact" },
+        { "source": "archimate:SystemSoftware", "target": "archimate:ApplicationComponent" },
+        { "source": "archimate:SystemSoftware", "target": "archimate:Artifact" }
+      ]
+    },
+    {
+      "id": "archimate:Realization",
+      "name": "Realization",
+      "lineStyle": "dashed",
+      "sourceArrow": "none",
+      "targetArrow": "hollow-triangle",
+      "documentation": "Indicates that an entity plays a critical role in the creation, achievement, sustenance, or operation of a more abstract entity.",
+      "validConnections": "realization-rules"
+    },
+    {
+      "id": "archimate:Serving",
+      "name": "Serving",
+      "lineStyle": "solid",
+      "sourceArrow": "none",
+      "targetArrow": "open",
+      "documentation": "Models that an element provides its functionality to another element.",
+      "validConnections": "serving-rules"
+    },
+    {
+      "id": "archimate:Access",
+      "name": "Access",
+      "lineStyle": "dashed",
+      "sourceArrow": "none",
+      "targetArrow": "open",
+      "documentation": "Models the access of behavioral elements to business or data objects.",
+      "validConnections": "behavior-to-passive",
+      "properties": [
+        { "name": "accessType", "type": "enum", "values": ["read", "write", "readwrite", "access"] }
+      ]
+    },
+    {
+      "id": "archimate:Triggering",
+      "name": "Triggering",
+      "lineStyle": "solid",
+      "sourceArrow": "none",
+      "targetArrow": "filled",
+      "documentation": "Represents a temporal or causal relationship between elements.",
+      "validConnections": "behavior-to-behavior"
+    },
+    {
+      "id": "archimate:Flow",
+      "name": "Flow",
+      "lineStyle": "dashed",
+      "sourceArrow": "none",
+      "targetArrow": "filled",
+      "documentation": "Represents transfer from one element to another.",
+      "validConnections": "behavior-to-behavior"
+    },
+    {
+      "id": "archimate:Specialization",
+      "name": "Specialization",
+      "lineStyle": "solid",
+      "sourceArrow": "none",
+      "targetArrow": "hollow-triangle",
+      "documentation": "Indicates that an element is a particular kind of another element.",
+      "validConnections": "same-type"
+    },
+    {
+      "id": "archimate:Association",
+      "name": "Association",
+      "lineStyle": "solid",
+      "sourceArrow": "none",
+      "targetArrow": "none",
+      "documentation": "Models an unspecified relationship, or a relationship that is not represented by another ArchiMate relationship.",
+      "validConnections": "any"
+    }
+  ],
+  "viewpoints": [
+    {
+      "id": "archimate:Layered",
+      "name": "Layered",
+      "allowedElements": "*",
+      "allowedRelationships": "*",
+      "description": "Provides an overview across multiple layers and aspects of an enterprise architecture."
+    },
+    {
+      "id": "archimate:Organization",
+      "name": "Organization",
+      "allowedElements": [
+        "archimate:BusinessActor",
+        "archimate:BusinessRole",
+        "archimate:Location"
+      ],
+      "allowedRelationships": "*",
+      "description": "Shows the structure of the enterprise in terms of roles and actors."
+    },
+    {
+      "id": "archimate:BusinessProcessCooperation",
+      "name": "Business Process Cooperation",
+      "allowedElements": [
+        "archimate:BusinessActor",
+        "archimate:BusinessRole",
+        "archimate:BusinessProcess",
+        "archimate:BusinessFunction",
+        "archimate:BusinessEvent",
+        "archimate:BusinessService",
+        "archimate:BusinessObject"
+      ],
+      "allowedRelationships": "*",
+      "description": "Shows the relationships between business processes."
+    },
+    {
+      "id": "archimate:ApplicationCooperation",
+      "name": "Application Cooperation",
+      "allowedElements": [
+        "archimate:ApplicationComponent",
+        "archimate:ApplicationInterface",
+        "archimate:ApplicationService",
+        "archimate:DataObject"
+      ],
+      "allowedRelationships": "*",
+      "description": "Shows application components and their interrelationships."
+    },
+    {
+      "id": "archimate:ApplicationUsage",
+      "name": "Application Usage",
+      "allowedElements": [
+        "archimate:BusinessProcess",
+        "archimate:BusinessFunction",
+        "archimate:BusinessEvent",
+        "archimate:ApplicationComponent",
+        "archimate:ApplicationInterface",
+        "archimate:ApplicationService",
+        "archimate:DataObject"
+      ],
+      "allowedRelationships": "*",
+      "description": "Shows how applications are used to support business processes."
+    },
+    {
+      "id": "archimate:Technology",
+      "name": "Technology",
+      "allowedElements": [
+        "archimate:Node",
+        "archimate:Device",
+        "archimate:SystemSoftware",
+        "archimate:TechnologyInterface",
+        "archimate:CommunicationNetwork",
+        "archimate:TechnologyService",
+        "archimate:Artifact"
+      ],
+      "allowedRelationships": "*",
+      "description": "Shows the technology infrastructure."
+    },
+    {
+      "id": "archimate:TechnologyUsage",
+      "name": "Technology Usage",
+      "allowedElements": [
+        "archimate:ApplicationComponent",
+        "archimate:ApplicationInterface",
+        "archimate:ApplicationService",
+        "archimate:DataObject",
+        "archimate:Node",
+        "archimate:Device",
+        "archimate:SystemSoftware",
+        "archimate:TechnologyInterface",
+        "archimate:CommunicationNetwork",
+        "archimate:TechnologyService",
+        "archimate:Artifact"
+      ],
+      "allowedRelationships": "*",
+      "description": "Shows how technology supports the application layer."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@eaflow/archimate",
+  "version": "0.1.0",
+  "description": "ArchiMate 3.2 notation metamodel for EAFlow",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./metamodel.json": "./src/metamodel.json"
+  },
+  "files": ["dist", "src/metamodel.json"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@eaflow/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.0"
+  }
+}
