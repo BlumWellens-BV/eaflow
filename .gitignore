@@ -1,5 +1,10 @@
-# Claude Code
-.claude
+# Claude Code - ignore personal config, track project skills
+.claude/*
+!.claude/skills/
+!.claude/commands/
+!.claude/guides/
+!.claude/references/
+!.claude/info/
 
 # Dependencies
 node_modules/

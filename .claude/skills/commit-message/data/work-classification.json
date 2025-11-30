@@ -1,0 +1,78 @@
+{
+  "commitTypes": {
+    "feat": {
+      "description": "New feature or capability",
+      "examples": ["New element type", "New panel", "New export format"]
+    },
+    "fix": {
+      "description": "Bug fix",
+      "examples": ["Correct rendering", "Fix validation", "Resolve crash"]
+    },
+    "docs": {
+      "description": "Documentation only",
+      "examples": ["README updates", "Code comments", "Architecture docs"]
+    },
+    "style": {
+      "description": "Code style/formatting only",
+      "examples": ["Prettier", "ESLint fixes", "Whitespace"]
+    },
+    "refactor": {
+      "description": "Code restructuring without behavior change",
+      "examples": ["Extract function", "Rename variable", "Simplify logic"]
+    },
+    "perf": {
+      "description": "Performance improvement",
+      "examples": ["Optimize render", "Reduce bundle size", "Cache results"]
+    },
+    "test": {
+      "description": "Adding or updating tests",
+      "examples": ["Unit tests", "Integration tests", "E2E tests"]
+    },
+    "chore": {
+      "description": "Maintenance, dependencies, config",
+      "examples": ["Update deps", "Config changes", "Tooling"]
+    },
+    "ci": {
+      "description": "CI/CD pipeline changes",
+      "examples": ["GitHub Actions", "Build scripts", "Deploy config"]
+    },
+    "build": {
+      "description": "Build system changes",
+      "examples": ["Vite config", "TypeScript config", "Bundle settings"]
+    }
+  },
+  "scopes": {
+    "metamodel": {
+      "description": "Metamodel engine, notation plugins",
+      "paths": ["src/metamodel/", "src/plugins/"]
+    },
+    "canvas": {
+      "description": "React Flow canvas, diagram rendering",
+      "paths": ["src/canvas/"]
+    },
+    "ui": {
+      "description": "UI components, panels, palettes",
+      "paths": ["src/components/", "src/panels/"]
+    },
+    "model": {
+      "description": "Element/relationship/diagram management",
+      "paths": ["src/model/"]
+    },
+    "persistence": {
+      "description": "File I/O, JSON format, import/export",
+      "paths": ["src/persistence/"]
+    },
+    "archimate": {
+      "description": "ArchiMate-specific code",
+      "paths": ["src/notations/archimate/"]
+    },
+    "bpmn": {
+      "description": "BPMN-specific code",
+      "paths": ["src/notations/bpmn/"]
+    },
+    "git": {
+      "description": "Git integration features",
+      "paths": ["src/git/"]
+    }
+  }
+}
