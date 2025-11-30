@@ -1,0 +1,260 @@
+# React Component Extraction Template
+
+Use this template to fix React Hook violations by extracting proper components.
+
+## Template: Table Cell Component
+
+For table columns with Hooks in cell renderers:
+
+```typescript
+import { Row } from '@tanstack/react-table';
+
+// Define row type
+interface YourRowType {
+  id: string;
+  field1: string;
+  field2: number;
+  // ... other fields
+}
+
+// Extract cell as proper component
+function YourFieldCell({ row }: { row: Row<YourRowType> }) {
+  // Now Hooks are allowed
+  const data = useTypedSelector((state) =>
+    selectSomething(state, row.original.id)
+  );
+
+  const handleClick = useCallback(() => {
+    // Event handlers
+  }, [/* deps */]);
+
+  return (
+    <div onClick={handleClick}>
+      {data}
+    </div>
+  );
+}
+
+// Use in column definition
+const columns: ColumnDef<YourRowType>[] = [
+  {
+    id: 'your_field',
+    header: 'Your Field',
+    cell: ({ row }) => <YourFieldCell row={row} />
+  }
+];
+```
+
+## Template: Render Prop Component
+
+For render props with Hooks:
+
+```typescript
+interface RenderComponentProps {
+  data: DataType;
+  onAction: () => void;
+}
+
+function RenderComponent({ data, onAction }: RenderComponentProps) {
+  // Hooks allowed in component
+  const [state, setState] = useState();
+  const value = useCustomHook(data);
+
+  useEffect(() => {
+    // Effects allowed
+  }, [data]);
+
+  return (
+    <div>
+      {value}
+      <button onClick={onAction}>Action</button>
+    </div>
+  );
+}
+
+// Use in parent
+<Parent
+  render={(data) => <RenderComponent data={data} onAction={handleAction} />}
+/>
+```
+
+## Step-by-Step Process
+
+### 1. Identify Hook Usage Location
+
+Find where Hook is called in non-component function:
+
+```typescript
+// ❌ BEFORE - Hook in non-component
+const columns = [
+  {
+    cell: ({ row }) => {
+      const data = useHook(); // Error here
+      return <div>{data}</div>;
+    }
+  }
+];
+```
+
+### 2. Extract Function as Component
+
+Move inline function to separate component:
+
+```typescript
+// ✅ AFTER - Extracted component
+function DataCell({ row }: { row: Row<RowType> }) {
+  const data = useHook(); // Now allowed
+  return <div>{data}</div>;
+}
+```
+
+### 3. Add TypeScript Types
+
+```typescript
+import { Row } from '@tanstack/react-table';
+
+interface RowType {
+  id: string;
+  // ... fields
+}
+
+function DataCell({ row }: { row: Row<RowType> }) {
+  const data = useHook();
+  return <div>{data}</div>;
+}
+```
+
+### 4. Update Column Definition
+
+```typescript
+const columns = [
+  {
+    cell: ({ row }) => <DataCell row={row} />
+  }
+];
+```
+
+## Common Patterns
+
+### Pattern: Table Cell with Selector
+
+```typescript
+function TenantIdCell({ row }: { row: Row<TenantRow> }) {
+  const tenantId = useTypedSelector((state) =>
+    selectTenantById(state, row.original.tenant_id)
+  );
+  return <div className="font-mono text-sm">{tenantId}</div>;
+}
+```
+
+### Pattern: Cell with State
+
+```typescript
+function EditableCell({ row }: { row: Row<DataRow> }) {
+  const [editing, setEditing] = useState(false);
+  const value = row.original.value;
+
+  return editing ? (
+    <input value={value} onChange={/* ... */} />
+  ) : (
+    <div onClick={() => setEditing(true)}>{value}</div>
+  );
+}
+```
+
+### Pattern: Cell with Effect
+
+```typescript
+function StatusCell({ row }: { row: Row<StatusRow> }) {
+  const status = row.original.status;
+
+  useEffect(() => {
+    // Track status changes
+    analytics.track('status_viewed', { status });
+  }, [status]);
+
+  return <Badge status={status} />;
+}
+```
+
+## Naming Convention
+
+Follow this pattern for component names:
+
+- `{DataType}Cell` for table cells (e.g., `TenantIdCell`, `StatusCell`)
+- `{Purpose}Component` for other cases (e.g., `UserAvatarComponent`)
+- Pascal case (not camelCase)
+- Descriptive of what it renders
+
+## Checklist
+
+- [ ] Extract inline function as separate component
+- [ ] Name component following convention
+- [ ] Add TypeScript prop types
+- [ ] Import needed types (`Row`, etc.)
+- [ ] Move all Hook calls into component
+- [ ] Update original location to use component
+- [ ] Verify component has access to needed context
+- [ ] Test rendering works correctly
+- [ ] Run ESLint to verify error fixed
+
+## Example: Full Fix
+
+### Before (Error)
+
+```typescript
+// apps/web/features/admin/components/tenants/TenantManagementTable.tsx
+import { ColumnDef } from '@tanstack/react-table';
+
+const columns: ColumnDef<TenantRow>[] = [
+  {
+    id: 'tenant_id',
+    header: 'Tenant ID',
+    cell: ({ row }) => {
+      // ❌ React Hook called in non-component function
+      const tenantId = useTypedSelector((state) =>
+        selectTenantById(state, row.original.tenant_id)
+      );
+      return <div>{tenantId}</div>;
+    }
+  }
+];
+```
+
+### After (Fixed)
+
+```typescript
+// apps/web/features/admin/components/tenants/TenantManagementTable.tsx
+import { ColumnDef, Row } from '@tanstack/react-table';
+import { useTypedSelector } from '@/hooks/useTypedSelector';
+import { selectTenantById } from '@/store/tenants';
+
+interface TenantRow {
+  tenant_id: string;
+  name: string;
+  status: string;
+}
+
+// ✅ Extracted as proper React component
+function TenantIdCell({ row }: { row: Row<TenantRow> }) {
+  const tenantId = useTypedSelector((state) =>
+    selectTenantById(state, row.original.tenant_id)
+  );
+  return <div className="font-mono text-sm">{tenantId}</div>;
+}
+
+const columns: ColumnDef<TenantRow>[] = [
+  {
+    id: 'tenant_id',
+    header: 'Tenant ID',
+    cell: ({ row }) => <TenantIdCell row={row} />
+  }
+];
+```
+
+## Notes
+
+- Component should be placed above the column definition
+- Keep component focused (single responsibility)
+- Use memo if performance is critical: `const MemoCell = memo(TenantIdCell)`
+- Ensure component has access to needed Redux/Context providers

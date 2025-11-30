@@ -1,0 +1,439 @@
+# Database Type Mappings for TypeScript Type Safety Enforcer
+
+## PostgreSQL to TypeScript Type Mapping
+
+This reference maps PostgreSQL data types to TypeScript types for automatic type generation.
+
+---
+
+## Basic Types
+
+### Numeric Types
+```yaml
+INTEGER:
+  typescript: number
+  description: 32-bit signed integer
+  example: id: number
+
+BIGINT:
+  typescript: string | number
+  description: 64-bit signed integer (use string to preserve precision)
+  example: big_id: string
+
+SMALLINT:
+  typescript: number
+  description: 16-bit signed integer
+  example: quantity: number
+
+DECIMAL:
+  typescript: string | number
+  description: High-precision decimal (use string for financial)
+  example: amount: string
+
+NUMERIC:
+  typescript: string | number
+  description: Arbitrary precision numeric
+  example: percentage: string
+
+REAL:
+  typescript: number
+  description: Single-precision floating point
+  example: latitude: number
+
+DOUBLE_PRECISION:
+  typescript: number
+  description: Double-precision floating point
+  example: longitude: number
+
+SERIAL:
+  typescript: number
+  description: Auto-incrementing integer
+  example: sequence_id: number
+
+BIGSERIAL:
+  typescript: string
+  description: Auto-incrementing bigint
+  example: big_sequence_id: string
+```
+
+### Text Types
+```yaml
+VARCHAR:
+  typescript: string
+  description: Variable-length text
+  example: name: string
+
+CHAR:
+  typescript: string
+  description: Fixed-length text
+  example: code: string
+
+TEXT:
+  typescript: string
+  description: Unlimited-length text
+  example: description: string
+
+UUID:
+  typescript: string
+  description: Universally unique identifier
+  example: id: string
+  pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+
+BYTEA:
+  typescript: Buffer | string
+  description: Binary data
+  example: data: Buffer
+```
+
+### Boolean Types
+```yaml
+BOOLEAN:
+  typescript: boolean
+  description: Boolean true/false
+  example: is_active: boolean
+```
+
+### Date/Time Types
+```yaml
+DATE:
+  typescript: Date | string
+  description: Date only (YYYY-MM-DD)
+  example: birth_date: Date
+  note: "Consider string for date-only without time"
+
+TIME:
+  typescript: string
+  description: Time of day
+  example: start_time: string
+  note: "Use string format HH:MM:SS"
+
+TIMESTAMP:
+  typescript: Date
+  description: Date and time without timezone
+  example: created_at: Date
+
+TIMESTAMP_WITH_TIMEZONE:
+  typescript: Date
+  description: Date and time with timezone
+  example: updated_at: Date
+
+INTERVAL:
+  typescript: string
+  description: Time interval
+  example: duration: string
+  note: "Use ISO 8601 duration format"
+```
+
+### JSON Types
+```yaml
+JSON:
+  typescript: Record<string, unknown>
+  description: JSON data
+  example: metadata: Record<string, unknown>
+  note: "Use z.unknown() for validation"
+
+JSONB:
+  typescript: Record<string, unknown>
+  description: Binary JSON (faster queries)
+  example: config: Record<string, unknown>
+  note: "Use z.unknown() for validation"
+  performance: "Better performance than JSON"
+```
+
+### Array Types
+```yaml
+INTEGER_ARRAY:
+  typescript: number[]
+  description: Array of integers
+  example: tag_ids: number[]
+
+TEXT_ARRAY:
+  typescript: string[]
+  description: Array of text
+  example: tags: string[]
+
+UUID_ARRAY:
+  typescript: string[]
+  description: Array of UUIDs
+  example: user_ids: string[]
+```
+
+### Enumeration Types
+```yaml
+ENUM:
+  typescript: string (union of values)
+  description: Enumerated type
+  example: |
+    CREATE TYPE status AS ENUM ('active', 'inactive', 'pending');
+    status: 'active' | 'inactive' | 'pending'
+  typescript_pattern: |
+    type Status = 'active' | 'inactive' | 'pending'
+    status: Status
+```
+
+---
+
+## Nullable Columns
+
+### Pattern: Optional Types
+```yaml
+NOT_NULL_COLUMN:
+  typescript: type
+  example: |
+    name VARCHAR NOT NULL
+    → name: string
+
+NULLABLE_COLUMN:
+  typescript: type | null
+  example: |
+    phone VARCHAR
+    → phone: string | null
+
+    alternatively:
+    phone: string | null | undefined
+  note: "Use | null for database NOT NULL constraint"
+```
+
+---
+
+## Data Vault 2.0 Specific Types
+
+### Hub Tables
+```yaml
+HUB_PATTERN:
+  description: "Fact table for business keys"
+  columns:
+    - "{entity}_hub_key: UUID (Primary Key)"
+    - "{entity}_bk: VARCHAR[] (Business Key)"
+    - "load_dts: TIMESTAMP (Load Date)"
+    - "record_source: VARCHAR (Source)"
+
+  typescript: |
+    interface UserHub {
+      user_hub_key: string
+      user_bk: string[]
+      load_dts: Date
+      record_source: string
+    }
+```
+
+### Link Tables
+```yaml
+LINK_PATTERN:
+  description: "Relationship between hubs"
+  columns:
+    - "{entity}_{entity}_link_key: UUID (Primary Key)"
+    - "{entity}_hub_key: UUID (Foreign Key)"
+    - "{entity}_hub_key: UUID (Foreign Key)"
+    - "load_dts: TIMESTAMP"
+    - "record_source: VARCHAR"
+
+  typescript: |
+    interface UserAssetLink {
+      user_asset_link_key: string
+      user_hub_key: string
+      asset_hub_key: string
+      load_dts: Date
+      record_source: string
+    }
+```
+
+### Satellite Tables
+```yaml
+SATELLITE_PATTERN:
+  description: "Attributes that change over time"
+  columns:
+    - "{entity}_satellite_key: UUID (Primary Key)"
+    - "{entity}_hub_key: UUID (Foreign Key)"
+    - "load_dts: TIMESTAMP (Effective Date)"
+    - "load_end_dts: TIMESTAMP (End Date, optional)"
+    - "hash_diff: VARCHAR (Change tracking)"
+    - "record_source: VARCHAR"
+    - "* (other attributes, all optional)"
+
+  typescript: |
+    interface UserSatellite {
+      user_satellite_key: string
+      user_hub_key: string
+      load_dts: Date
+      load_end_dts?: Date
+      hash_diff: string
+      record_source: string
+      email?: string
+      name?: string
+      phone?: string | null
+    }
+```
+
+---
+
+## Composite Types
+
+### Example: Company with Address
+```sql
+CREATE TABLE company (
+  id UUID PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  address_line_1 VARCHAR,
+  address_line_2 VARCHAR,
+  city VARCHAR,
+  state VARCHAR,
+  zip_code VARCHAR,
+  country VARCHAR
+);
+```
+
+```typescript
+// Option 1: Flat structure (simpler)
+interface Company {
+  id: string
+  name: string
+  address_line_1?: string
+  address_line_2?: string
+  city?: string
+  state?: string
+  zip_code?: string
+  country?: string
+}
+
+// Option 2: Nested structure (better modeling)
+interface Address {
+  line_1?: string
+  line_2?: string
+  city?: string
+  state?: string
+  zip_code?: string
+  country?: string
+}
+
+interface Company {
+  id: string
+  name: string
+  address: Address
+}
+```
+
+---
+
+## Special Patterns
+
+### Tenant Isolation
+```yaml
+TENANT_ID_PATTERN:
+  columns:
+    - "tenant_id: UUID NOT NULL (For row-level security)"
+
+  typescript: |
+    interface TenantScoped {
+      tenant_id: string
+      // ... other fields
+    }
+
+  usage: |
+    // Always include tenant_id in WHERE clause
+    const data = await db.query('SELECT * FROM table WHERE tenant_id = $1', [tenantId])
+```
+
+### Soft Deletes
+```yaml
+SOFT_DELETE_PATTERN:
+  columns:
+    - "deleted_at: TIMESTAMP (NULL = not deleted, set = deleted)"
+
+  typescript: |
+    interface SoftDeleteable {
+      deleted_at: Date | null
+    }
+
+  query: |
+    // Always filter out soft-deleted records
+    SELECT * FROM table WHERE deleted_at IS NULL
+```
+
+### Timestamps
+```yaml
+AUDIT_TIMESTAMP_PATTERN:
+  columns:
+    - "created_at: TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    - "updated_at: TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP"
+
+  typescript: |
+    interface Auditable {
+      created_at: Date
+      updated_at: Date
+    }
+```
+
+---
+
+## Usage in Type Generation
+
+### Migration to TypeScript Example
+
+**PostgreSQL Migration**:
+```sql
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) NOT NULL UNIQUE,
+  name VARCHAR(255),
+  role VARCHAR(50) NOT NULL DEFAULT 'user',
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP,
+  metadata JSONB
+);
+```
+
+**Generated TypeScript**:
+```typescript
+interface User {
+  id: string
+  email: string
+  name: string | null
+  role: string
+  is_active: boolean
+  created_at: Date
+  updated_at: Date
+  deleted_at: Date | null
+  metadata: Record<string, unknown> | null
+}
+
+// With Zod validation
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  name: z.string().nullable(),
+  role: z.string(),
+  is_active: z.boolean(),
+  created_at: z.date(),
+  updated_at: z.date(),
+  deleted_at: z.date().nullable(),
+  metadata: z.record(z.unknown()).nullable(),
+})
+
+export type User = z.infer<typeof UserSchema>
+```
+
+---
+
+## Notes
+
+1. **Precision Loss**: BIGINT mapped to `string` to preserve precision in JavaScript
+2. **DateTime**: Consider timezone handling in application code
+3. **JSON**: Use `Record<string, unknown>` for type safety, but validate at runtime
+4. **Enums**: Generate union types from SQL enum definitions
+5. **Arrays**: TypeScript arrays map to PostgreSQL array types
+6. **NULL**: Columns without NOT NULL constraint should be optional in TypeScript
+7. **UUIDs**: Always use `string` type, validate with UUID regex if needed
+
+## Extension
+
+To add new type mappings:
+
+1. Determine PostgreSQL type
+2. Find corresponding TypeScript type
+3. Consider nullable/optional handling
+4. Add to appropriate section
+5. Provide example usage
+6. Document special considerations

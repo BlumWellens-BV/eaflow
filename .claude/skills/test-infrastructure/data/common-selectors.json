@@ -1,0 +1,239 @@
+{
+  "description": "Common Playwright selectors for E2E tests. Prefer data-testid over CSS classes or text matching for stability.",
+  "authentication": {
+    "login_page": {
+      "email_input": "input[name='email']",
+      "password_input": "input[name='password']",
+      "submit_button": "button[type='submit']",
+      "forgot_password_link": "a:has-text('Forgot password')",
+      "signup_link": "a:has-text('Sign up')",
+      "error_message": "[data-testid='login-error']",
+      "loading_spinner": "[data-testid='loading']"
+    },
+    "signup_page": {
+      "email_input": "input[name='email']",
+      "password_input": "input[name='password']",
+      "confirm_password_input": "input[name='confirmPassword']",
+      "submit_button": "button[type='submit']",
+      "login_link": "a:has-text('Log in')",
+      "terms_checkbox": "input[name='agreeToTerms']"
+    },
+    "user_menu": {
+      "menu_button": "[data-testid='user-menu']",
+      "profile_link": "a:has-text('Profile')",
+      "settings_link": "a:has-text('Settings')",
+      "logout_button": "button:has-text('Logout')",
+      "user_email": "[data-testid='user-email']"
+    }
+  },
+  "navigation": {
+    "navbar": {
+      "container": "[data-testid='nav-bar']",
+      "logo": "[data-testid='logo']",
+      "home_link": "a:has-text('Home')",
+      "assets_link": "a:has-text('Assets')",
+      "workflows_link": "a:has-text('Workflows')",
+      "settings_link": "a:has-text('Settings')"
+    },
+    "sidebar": {
+      "container": "[data-testid='sidebar']",
+      "toggle_button": "[data-testid='sidebar-toggle']",
+      "menu_item": "[data-testid='sidebar-menu-item']"
+    },
+    "breadcrumbs": {
+      "container": "[data-testid='breadcrumbs']",
+      "home": "[data-testid='breadcrumb-home']",
+      "separator": "[data-testid='breadcrumb-separator']"
+    }
+  },
+  "assets": {
+    "list_view": {
+      "container": "[data-testid='asset-grid']",
+      "card": "[data-testid='asset-card']",
+      "thumbnail": "[data-testid='asset-thumbnail']",
+      "filename": "[data-testid='asset-filename']",
+      "upload_date": "[data-testid='asset-upload-date']",
+      "file_size": "[data-testid='asset-size']",
+      "empty_state": "[data-testid='empty-state']",
+      "loading_skeleton": "[data-testid='loading-skeleton']"
+    },
+    "upload": {
+      "button": "[data-testid='upload-button']",
+      "modal": "[data-testid='upload-modal']",
+      "file_input": "input[type='file']",
+      "drag_drop_zone": "[data-testid='drag-drop-zone']",
+      "submit_button": "[data-testid='upload-submit']",
+      "cancel_button": "[data-testid='upload-cancel']",
+      "progress_bar": "[data-testid='upload-progress']",
+      "success_message": "[data-testid='upload-success']",
+      "error_message": "[data-testid='upload-error']"
+    },
+    "detail_view": {
+      "container": "[data-testid='asset-detail']",
+      "image": "[data-testid='asset-image']",
+      "metadata": "[data-testid='asset-metadata']",
+      "download_button": "[data-testid='download-button']",
+      "delete_button": "[data-testid='delete-button']",
+      "edit_button": "[data-testid='edit-button']",
+      "share_button": "[data-testid='share-button']"
+    },
+    "search_filter": {
+      "search_input": "input[name='search']",
+      "filter_button": "[data-testid='filter-button']",
+      "sort_dropdown": "[data-testid='sort-dropdown']",
+      "date_range_picker": "[data-testid='date-range-picker']",
+      "clear_filters_button": "[data-testid='clear-filters']"
+    }
+  },
+  "workflows": {
+    "list_view": {
+      "container": "[data-testid='workflow-list']",
+      "row": "[data-testid='workflow-row']",
+      "name": "[data-testid='workflow-name']",
+      "status": "[data-testid='workflow-status']",
+      "created_date": "[data-testid='workflow-created']",
+      "create_button": "[data-testid='create-workflow-button']"
+    },
+    "builder": {
+      "canvas": "[data-testid='workflow-canvas']",
+      "node": "[data-testid='workflow-node']",
+      "connection": "[data-testid='workflow-connection']",
+      "add_node_button": "[data-testid='add-node']",
+      "save_button": "[data-testid='save-workflow']",
+      "run_button": "[data-testid='run-workflow']",
+      "node_config_panel": "[data-testid='node-config']"
+    }
+  },
+  "forms": {
+    "generic": {
+      "form": "form",
+      "text_input": "input[type='text']",
+      "email_input": "input[type='email']",
+      "password_input": "input[type='password']",
+      "textarea": "textarea",
+      "checkbox": "input[type='checkbox']",
+      "radio": "input[type='radio']",
+      "select": "select",
+      "submit_button": "button[type='submit']",
+      "cancel_button": "button:has-text('Cancel')",
+      "reset_button": "button[type='reset']"
+    },
+    "validation": {
+      "field_error": "[data-testid='field-error']",
+      "form_error": "[data-testid='form-error']",
+      "required_indicator": "[data-testid='required']",
+      "help_text": "[data-testid='help-text']"
+    }
+  },
+  "modals_dialogs": {
+    "modal": {
+      "container": "[data-testid='modal']",
+      "overlay": "[data-testid='modal-overlay']",
+      "close_button": "[data-testid='modal-close']",
+      "title": "[data-testid='modal-title']",
+      "body": "[data-testid='modal-body']",
+      "footer": "[data-testid='modal-footer']",
+      "confirm_button": "[data-testid='modal-confirm']",
+      "cancel_button": "[data-testid='modal-cancel']"
+    },
+    "confirmation_dialog": {
+      "container": "[data-testid='confirm-dialog']",
+      "message": "[data-testid='confirm-message']",
+      "yes_button": "button:has-text('Yes')",
+      "no_button": "button:has-text('No')",
+      "confirm_button": "button:has-text('Confirm')",
+      "cancel_button": "button:has-text('Cancel')"
+    },
+    "toast": {
+      "container": "[data-testid='toast']",
+      "success": "[data-testid='toast-success']",
+      "error": "[data-testid='toast-error']",
+      "warning": "[data-testid='toast-warning']",
+      "info": "[data-testid='toast-info']",
+      "close_button": "[data-testid='toast-close']"
+    }
+  },
+  "data_tables": {
+    "table": {
+      "container": "[data-testid='data-table']",
+      "header": "thead",
+      "header_cell": "th",
+      "body": "tbody",
+      "row": "tr",
+      "cell": "td",
+      "sort_button": "[data-testid='sort-button']",
+      "filter_input": "[data-testid='table-filter']"
+    },
+    "pagination": {
+      "container": "[data-testid='pagination']",
+      "previous_button": "[data-testid='pagination-prev']",
+      "next_button": "[data-testid='pagination-next']",
+      "first_button": "[data-testid='pagination-first']",
+      "last_button": "[data-testid='pagination-last']",
+      "page_number": "[data-testid='page-number']",
+      "page_size_select": "[data-testid='page-size']"
+    }
+  },
+  "loading_states": {
+    "spinner": "[data-testid='loading-spinner']",
+    "skeleton": "[data-testid='loading-skeleton']",
+    "progress_bar": "[data-testid='progress-bar']",
+    "loading_overlay": "[data-testid='loading-overlay']",
+    "loading_text": "[data-testid='loading-text']"
+  },
+  "empty_states": {
+    "container": "[data-testid='empty-state']",
+    "icon": "[data-testid='empty-icon']",
+    "title": "[data-testid='empty-title']",
+    "message": "[data-testid='empty-message']",
+    "action_button": "[data-testid='empty-action']"
+  },
+  "error_states": {
+    "error_boundary": "[data-testid='error-boundary']",
+    "error_message": "[data-testid='error-message']",
+    "retry_button": "[data-testid='retry-button']",
+    "404_page": "[data-testid='404-page']",
+    "500_page": "[data-testid='500-page']"
+  },
+  "best_practices": [
+    "Prefer data-testid attributes - they don't change with styling",
+    "Avoid CSS class selectors - they change frequently",
+    "Avoid text matching - it breaks with i18n and content changes",
+    "Use role-based selectors when appropriate: getByRole('button', { name: 'Submit' })",
+    "Combine selectors for specificity: [data-testid='modal'] button[type='submit']",
+    "Use nth-child() sparingly - it's brittle when order changes",
+    "Add data-testid to components during development, not after",
+    "Use descriptive test IDs: upload-button not btn-1",
+    "Keep selectors in centralized file for reusability",
+    "Update selectors when component structure changes"
+  ],
+  "selector_priority": {
+    "1_highest": "data-testid attributes",
+    "2_high": "Semantic HTML (form, button, input)",
+    "3_medium": "ARIA roles and labels",
+    "4_low": "Stable IDs (#id)",
+    "5_lowest": "CSS classes and text content"
+  },
+  "anti_patterns": [
+    {
+      "bad": ".btn-primary",
+      "reason": "CSS classes change with styling",
+      "good": "[data-testid='submit-button']"
+    },
+    {
+      "bad": "button:has-text('Submit')",
+      "reason": "Text changes with i18n",
+      "good": "[data-testid='submit-button'] or getByRole('button', { name: /submit/i })"
+    },
+    {
+      "bad": "div > div > button:nth-child(2)",
+      "reason": "Brittle - breaks with structure changes",
+      "good": "[data-testid='cancel-button']"
+    },
+    {
+      "bad": "await page.click('button')",
+      "reason": "Too generic - may click wrong button",
+      "good": "await page.click('[data-testid='upload-button']')"
+    }
+  ]
+}

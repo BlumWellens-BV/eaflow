@@ -1,0 +1,348 @@
+# Type Inference Patterns for TypeScript Type Safety Enforcer
+
+## Pattern Detection Rules
+
+These patterns help the skill infer correct types for `any` variables and parameters.
+
+---
+
+## 1. String Detection Patterns
+
+### Pattern 1.1: String Literal Usage
+**Pattern**: Variable/parameter used with string methods
+```typescript
+value.toLowerCase()
+value.toUpperCase()
+value.split(',')
+value.includes('x')
+value.substring(0, 5)
+value.length
+```
+**Inference**: `string`
+**Confidence**: High
+
+### Pattern 1.2: String Assignment
+**Pattern**: Assigned string literal or result of string function
+```typescript
+const x: any = "hello"
+const y: any = functionReturningString()
+const z: any = template`string`
+```
+**Inference**: `string`
+**Confidence**: High
+
+### Pattern 1.3: String Coercion
+**Pattern**: Passed to String() constructor or template literal
+```typescript
+String(value)
+`${value}`
+value.toString()
+value + ""
+```
+**Inference**: `string` or `unknown` (if calling toString)
+**Confidence**: Medium
+
+---
+
+## 2. Number Detection Patterns
+
+### Pattern 2.1: Numeric Operations
+**Pattern**: Variable/parameter used in arithmetic
+```typescript
+value * 2
+value + 5
+value - 3
+value / 2
+value % 2
+Math.floor(value)
+Math.round(value)
+```
+**Inference**: `number`
+**Confidence**: High
+
+### Pattern 2.2: Array Index
+**Pattern**: Used as array index
+```typescript
+array[value]
+array.slice(0, value)
+array[value]?.property
+```
+**Inference**: `number`
+**Confidence**: High (assuming integer)
+
+### Pattern 2.3: Numeric Literals
+**Pattern**: Assigned numeric literal or number function
+```typescript
+const x: any = 42
+const y: any = parseInt(...)
+const z: any = Number.parseFloat(...)
+```
+**Inference**: `number`
+**Confidence**: High
+
+---
+
+## 3. Boolean Detection Patterns
+
+### Pattern 3.1: Boolean Operators
+**Pattern**: Used in boolean context
+```typescript
+if (value) { }
+while (value) { }
+value && something()
+value || something()
+!value
+value ? true : false
+```
+**Inference**: `boolean`
+**Confidence**: Medium
+
+### Pattern 3.2: Comparison Results
+**Pattern**: Result of comparison
+```typescript
+const x: any = a === b
+const y: any = a > b
+const z: any = a <= b
+const w: any = typeof something === 'string'
+```
+**Inference**: `boolean`
+**Confidence**: High
+
+### Pattern 3.3: Boolean Literals
+**Pattern**: Assigned boolean literal
+```typescript
+const x: any = true
+const y: any = false
+```
+**Inference**: `boolean`
+**Confidence**: High
+
+---
+
+## 4. Array Detection Patterns
+
+### Pattern 4.1: Array Methods
+**Pattern**: Array methods called on value
+```typescript
+value.map(x => x)
+value.filter(x => x)
+value.forEach(x => x)
+value.reduce((a, b) => a + b)
+value.some(x => x)
+value.length > 0
+```
+**Inference**: `unknown[]` (element type unknown)
+**Confidence**: High
+
+### Pattern 4.2: Array Iteration
+**Pattern**: Iterated in for-of loop
+```typescript
+for (const item of value) { }
+for (const item in value) { }
+```
+**Inference**: `unknown[]` (could be object too)
+**Confidence**: Medium
+
+### Pattern 4.3: Array Literals
+**Pattern**: Assigned array literal
+```typescript
+const x: any = [1, 2, 3]
+const y: any = []
+```
+**Inference**: `number[]` or `unknown[]`
+**Confidence**: High (for non-empty)
+
+---
+
+## 5. Object Detection Patterns
+
+### Pattern 5.1: Property Access
+**Pattern**: Properties accessed on value
+```typescript
+value.id
+value.name
+value['email']
+value?.toString()
+```
+**Inference**: `{ id: unknown; ... }` (structure inferred)
+**Confidence**: Medium
+
+### Pattern 5.2: Object Method Calls
+**Pattern**: Object methods called
+```typescript
+Object.keys(value)
+Object.values(value)
+JSON.stringify(value)
+Object.assign(value, other)
+```
+**Inference**: `Record<string, unknown>` or specific object
+**Confidence**: Medium
+
+### Pattern 5.3: Object Literals
+**Pattern**: Assigned object literal
+```typescript
+const x: any = { id: 1, name: 'x' }
+const y: any = {}
+```
+**Inference**: Inferred object shape
+**Confidence**: High
+
+---
+
+## 6. Function Detection Patterns
+
+### Pattern 6.1: Function Calls
+**Pattern**: Value called as function
+```typescript
+value()
+value(arg1, arg2)
+value.call(this)
+value.apply(context, args)
+```
+**Inference**: `(...args: unknown[]) => unknown`
+**Confidence**: High
+
+### Pattern 6.2: Function Properties
+**Pattern**: Function-like properties
+```typescript
+value.name
+value.length
+value.bind()
+value.toString()
+```
+**Inference**: `Function` or callable type
+**Confidence**: Medium
+
+---
+
+## 7. Database Model Patterns
+
+### Pattern 7.1: Database Query Result
+**Pattern**: Result of database query
+```typescript
+const result: any = await db.query(...)
+const rows: any = await db.query('SELECT * FROM users')
+```
+**Inference**: Check database schema for table
+**Suggestion**: `UserRow` or `UserHub` (from schema)
+**Confidence**: High (with schema access)
+
+### Pattern 7.2: Tenant-Scoped Data
+**Pattern**: Data with tenant scoping
+```typescript
+const userId: any = tenant.userId
+const tenantId: any = context.tenantId
+```
+**Inference**: `string` or `UUID`
+**Confidence**: High (check tenant schema)
+
+---
+
+## 8. Union Type Detection Patterns
+
+### Pattern 8.1: Conditional Assignment
+**Pattern**: Different types assigned in conditions
+```typescript
+let value: any = null
+if (condition) {
+  value = 'string'
+} else {
+  value = 42
+}
+```
+**Inference**: `string | number | null`
+**Confidence**: Medium
+
+### Pattern 8.2: null/undefined Handling
+**Pattern**: Checked for null or undefined
+```typescript
+if (value === null) { ... }
+if (value === undefined) { ... }
+if (value ?? defaultValue) { ... }
+value?.property
+```
+**Inference**: `T | null | undefined` (T inferred from other usage)
+**Confidence**: Medium
+
+### Pattern 8.3: Discriminated Union
+**Pattern**: Property checked for specific values
+```typescript
+if (result.status === 'success') { ... }
+if (result.type === 'admin') { ... }
+switch (item.kind) { ... }
+```
+**Inference**: Discriminated union type
+**Confidence**: High (with full context)
+
+---
+
+## 9. Generic Type Patterns
+
+### Pattern 9.1: Constrained Generic
+**Pattern**: Generic function with constraints
+```typescript
+function process<T extends string>(value: T): T { ... }
+function merge<T extends object, U extends T>(a: T, b: U): U { ... }
+```
+**Inference**: Proper constraint needed
+**Confidence**: High
+
+### Pattern 9.2: Generic Parameter Mismatch
+**Pattern**: Generic called with wrong type
+```typescript
+const repo: Repository<string> = createRepository<User>()
+const item: Item<number> = processItem<string>(data)
+```
+**Inference**: Type mismatch detected
+**Confidence**: High
+
+---
+
+## Confidence Scoring
+
+### High Confidence (95-100%)
+- String method calls (toLowerCase, split, etc.)
+- Numeric operations (+, -, *, /)
+- Array method calls (map, filter, forEach)
+- Property access with known names (id, name, email)
+- Literal assignments (const x: any = "string")
+- Discriminated union patterns
+
+### Medium Confidence (75-94%)
+- Boolean contexts (if, while)
+- Object property patterns
+- Generic type inference
+- Conditional assignments
+- Null/undefined checks
+- Return type inference from multiple paths
+
+### Low Confidence (50-74%)
+- External library calls
+- Complex business logic
+- Reflection patterns
+- Dynamic property names
+- Type coercion edge cases
+
+---
+
+## Usage in Skill
+
+1. **Detection Phase**: Run patterns against code to find type hints
+2. **Scoring Phase**: Calculate confidence for each pattern match
+3. **Suggestion Phase**: Generate type suggestions sorted by confidence
+4. **Application Phase**: Apply high-confidence fixes, review medium/low
+
+## Pattern Extension
+
+Add new patterns following this format:
+
+```yaml
+pattern_name:
+  description: "What this pattern detects"
+  code_examples:
+    - "code example 1"
+    - "code example 2"
+  inference: "inferred type"
+  confidence: "High|Medium|Low"
+  category: "string|number|boolean|array|object|function|union|generic|database"
+```

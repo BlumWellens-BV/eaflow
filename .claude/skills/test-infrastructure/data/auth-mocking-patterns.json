@@ -1,0 +1,180 @@
+{
+  "patterns": [
+    {
+      "name": "authenticated-with-tenant",
+      "description": "Standard authenticated user with tenant context (most common)",
+      "use_cases": [
+        "Testing multi-tenant API routes",
+        "Testing tenant-scoped data access",
+        "Testing RLS policies",
+        "Testing user permissions"
+      ],
+      "mock_structure": {
+        "user_id": "usr_test_01234567890123456789",
+        "tenant_id": "ten_test_01234567890123456789",
+        "email": "test@example.com",
+        "role": "authenticated"
+      },
+      "template_function": "createMockSupabaseClient(userId, tenantId)"
+    },
+    {
+      "name": "unauthenticated",
+      "description": "No user session (testing auth failures)",
+      "use_cases": [
+        "Testing 401 responses",
+        "Testing login/signup flows",
+        "Testing public endpoints",
+        "Testing auth middleware"
+      ],
+      "mock_structure": {
+        "user": null,
+        "session": null,
+        "error": "Not authenticated"
+      },
+      "template_function": "createUnauthenticatedSupabaseClient()"
+    },
+    {
+      "name": "admin-user",
+      "description": "User with admin privileges",
+      "use_cases": [
+        "Testing admin-only routes",
+        "Testing privileged operations",
+        "Testing cross-tenant access",
+        "Testing system configuration"
+      ],
+      "mock_structure": {
+        "user_id": "usr_admin_01234567890123456789",
+        "tenant_id": "ten_test_01234567890123456789",
+        "email": "admin@example.com",
+        "role": "admin",
+        "user_metadata": {
+          "role": "admin"
+        }
+      },
+      "template_function": "createMockAdminSupabaseClient()"
+    },
+    {
+      "name": "user-without-tenant",
+      "description": "Authenticated user not yet assigned to tenant",
+      "use_cases": [
+        "Testing onboarding flows",
+        "Testing tenant creation",
+        "Testing first-time user setup",
+        "Testing tenant invitation"
+      ],
+      "mock_structure": {
+        "user_id": "usr_test_01234567890123456789",
+        "tenant_id": null,
+        "email": "newuser@example.com",
+        "role": "authenticated"
+      },
+      "template_function": "createMockSupabaseClientWithoutTenant(userId)"
+    },
+    {
+      "name": "expired-session",
+      "description": "User with expired session token",
+      "use_cases": [
+        "Testing token refresh logic",
+        "Testing session expiry handling",
+        "Testing auto-logout",
+        "Testing token validation"
+      ],
+      "mock_structure": {
+        "user": null,
+        "session": {
+          "expires_at": 0,
+          "expired": true
+        },
+        "error": "Session expired"
+      },
+      "custom_implementation_needed": true
+    },
+    {
+      "name": "multiple-tenants",
+      "description": "User belongs to multiple tenants",
+      "use_cases": [
+        "Testing tenant switching",
+        "Testing cross-tenant operations",
+        "Testing tenant isolation",
+        "Testing data segregation"
+      ],
+      "mock_structure": {
+        "user_id": "usr_test_01234567890123456789",
+        "tenants": [
+          "ten_test_11111111111111111111",
+          "ten_test_22222222222222222222"
+        ],
+        "current_tenant_id": "ten_test_11111111111111111111"
+      },
+      "custom_implementation_needed": true
+    }
+  ],
+  "common_mock_data": {
+    "tenant_ids": {
+      "default": "ten_test_01234567890123456789",
+      "second": "ten_test_99999999999999999999",
+      "admin": "ten_admin_01234567890123456789"
+    },
+    "user_ids": {
+      "default": "usr_test_01234567890123456789",
+      "second": "usr_test_99999999999999999999",
+      "admin": "usr_admin_01234567890123456789"
+    },
+    "emails": {
+      "default": "test@example.com",
+      "admin": "admin@example.com",
+      "second": "test2@example.com"
+    }
+  },
+  "request_headers": {
+    "authenticated": {
+      "Authorization": "Bearer mock-jwt-token",
+      "Content-Type": "application/json",
+      "X-Tenant-ID": "ten_test_01234567890123456789"
+    },
+    "unauthenticated": {
+      "Content-Type": "application/json"
+    },
+    "admin": {
+      "Authorization": "Bearer mock-admin-jwt-token",
+      "Content-Type": "application/json",
+      "X-Tenant-ID": "ten_test_01234567890123456789",
+      "X-Admin": "true"
+    }
+  },
+  "rls_testing": {
+    "description": "Patterns for testing Row-Level Security policies",
+    "scenarios": [
+      {
+        "name": "tenant-isolation",
+        "test": "User from tenant A cannot access data from tenant B",
+        "setup": "Create data for tenant A, authenticate as user from tenant B",
+        "expected": "Query returns no rows (RLS blocks access)"
+      },
+      {
+        "name": "user-owns-data",
+        "test": "User can only access their own data",
+        "setup": "Create data owned by user A, authenticate as user B (same tenant)",
+        "expected": "Query returns no rows if policy enforces ownership"
+      },
+      {
+        "name": "admin-bypass",
+        "test": "Admin can access all tenant data",
+        "setup": "Create data for multiple tenants, authenticate as admin",
+        "expected": "Query returns data from all tenants (if policy allows)"
+      }
+    ]
+  },
+  "best_practices": [
+    "Use consistent mock IDs across tests for predictability",
+    "Generate unique IDs with nanoid() to avoid conflicts in parallel tests",
+    "Mock database responses, not just auth - test the full stack",
+    "Test both authenticated and unauthenticated states",
+    "Always test tenant isolation for multi-tenant apps",
+    "Use type-safe mocks (SupabaseClient<Database>)",
+    "Mock at the Supabase client level, not HTTP level",
+    "Include user_metadata for tenant context",
+    "Test session expiry and refresh flows",
+    "Verify RLS policies with wrong-tenant tests"
+  ]
+}

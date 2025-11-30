@@ -1,0 +1,80 @@
+# ESLint Disable Console Template
+
+Use this template to suppress console statement warnings in CLI tools and Node.js scripts.
+
+## Template: Inline Suppression
+
+```typescript
+/* eslint-disable no-console */
+console.log('Your console output here');
+console.error('Error messages');
+console.warn('Warnings');
+/* eslint-enable no-console */
+```
+
+## Template: File-Level Suppression
+
+For CLI entry points where all console usage is legitimate:
+
+```typescript
+// At top of file
+/* eslint-disable no-console */
+
+// Now all console statements allowed in this file
+console.log('Starting application...');
+// ... rest of CLI code
+```
+
+## When to Use
+
+**CLI Tools** (Suppress):
+- `apps/desktop-sync/src/main.ts`
+- `apps/*/src/cli.ts`
+- Entry point files that need user-facing console output
+
+**Node.js Scripts** (Suppress):
+- `scripts/**/*.js`
+- Build scripts
+- Utility scripts
+
+**API Routes/Components** (Do NOT use - Remove instead):
+- Use logger instead: `import { logger } from '@/lib/logger'`
+- `logger.debug()`, `logger.info()`, `logger.warn()`, `logger.error()`
+
+## Example Usage
+
+### Before
+```typescript
+// File: apps/desktop-sync/src/main.ts
+// ❌ ESLint error
+console.log('Desktop Sync v1.0.0');
+console.log('Configuration loaded');
+```
+
+### After
+```typescript
+// File: apps/desktop-sync/src/main.ts
+/* eslint-disable no-console */
+console.log('Desktop Sync v1.0.0');
+console.log('Configuration loaded');
+/* eslint-enable no-console */
+```
+
+## Alternative: Use Logger
+
+For non-CLI code, replace console with logger:
+
+```typescript
+import { logger } from '@/lib/logger';
+
+// Structured logging with context
+logger.info('Desktop Sync started', { version: '1.0.0' });
+logger.debug({ config }, 'Configuration loaded');
+```
+
+## Notes
+
+- Only use for legitimate console output (CLI tools, scripts)
+- For debug logging in API/components, use logger instead
+- Keep eslint-disable scope as narrow as possible
+- Document why console is needed in comment

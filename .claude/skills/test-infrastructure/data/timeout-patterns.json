@@ -1,0 +1,238 @@
+{
+  "timeout_causes": [
+    {
+      "pattern": "Database query never returns",
+      "symptoms": [
+        "Test hangs indefinitely",
+        "No error message, just timeout",
+        "Other database tests pass fine"
+      ],
+      "common_causes": [
+        {
+          "cause": "Missing database index - full table scan",
+          "detection": "Run EXPLAIN ANALYZE on query",
+          "immediate_fix": "Increase test timeout to 30-60s",
+          "proper_fix": "Add database index on filtered/sorted columns",
+          "example": "CREATE INDEX idx_sat_asset_metadata_tenant_id ON dv.sat_asset_metadata(tenant_id);"
+        },
+        {
+          "cause": "Deadlock or lock contention",
+          "detection": "Check pg_locks table, look for blocked queries",
+          "immediate_fix": "Reduce parallel test execution",
+          "proper_fix": "Use database transactions for test isolation, reduce lock scope",
+          "example": "BEGIN; ... test operations ... ROLLBACK;"
+        },
+        {
+          "cause": "Query returns too many rows (no LIMIT)",
+          "detection": "Check query for LIMIT clause, look at row count",
+          "immediate_fix": "Add LIMIT to test query",
+          "proper_fix": "Always paginate large result sets",
+          "example": "SELECT * FROM table WHERE tenant_id = 'x' LIMIT 100"
+        }
+      ]
+    },
+    {
+      "pattern": "Promise never resolves",
+      "symptoms": [
+        "Test hangs on await statement",
+        "No error thrown",
+        "Async operation incomplete"
+      ],
+      "common_causes": [
+        {
+          "cause": "Missing await keyword",
+          "detection": "Code review - check all async calls have await",
+          "immediate_fix": "Add await to Promise",
+          "proper_fix": "Use TypeScript strict mode to catch unawaited Promises",
+          "example": "await supabase.from('table').select() // Don't forget await!"
+        },
+        {
+          "cause": "Unhandled Promise rejection",
+          "detection": "Check for .catch() or try/catch around Promise",
+          "immediate_fix": "Add error handling",
+          "proper_fix": "Always handle errors in async code",
+          "example": "try { await operation(); } catch (error) { console.error(error); }"
+        },
+        {
+          "cause": "Callback never called",
+          "detection": "Check if callback-based API needs promisification",
+          "immediate_fix": "Wrap callback in Promise",
+          "proper_fix": "Use Promise-based APIs instead of callbacks",
+          "example": "new Promise((resolve, reject) => { callback((err, data) => err ? reject(err) : resolve(data)); })"
+        }
+      ]
+    },
+    {
+      "pattern": "Infinite loop in test",
+      "symptoms": [
+        "Test runs forever",
+        "CPU usage spikes",
+        "No progress in test output"
+      ],
+      "common_causes": [
+        {
+          "cause": "While loop condition never false",
+          "detection": "Add console.log to loop, check iteration count",
+          "immediate_fix": "Add iteration limit",
+          "proper_fix": "Fix loop condition logic",
+          "example": "let iterations = 0; while (condition && iterations++ < 1000) { ... }"
+        },
+        {
+          "cause": "Recursive function without base case",
+          "detection": "Stack trace shows repeated function calls",
+          "immediate_fix": "Add depth limit parameter",
+          "proper_fix": "Add proper base case to recursion",
+          "example": "function recursive(depth = 0) { if (depth > 100) return; ... }"
+        },
+        {
+          "cause": "Polling loop never exits",
+          "detection": "Check polling condition, verify it can become true",
+          "immediate_fix": "Add timeout to polling loop",
+          "proper_fix": "Use proper wait condition or event-based approach",
+          "example": "const timeout = Date.now() + 5000; while (condition && Date.now() < timeout) { ... }"
+        }
+      ]
+    },
+    {
+      "pattern": "External service call blocks",
+      "symptoms": [
+        "Test hangs on external API call",
+        "Network request never completes",
+        "Test fails in CI but passes locally"
+      ],
+      "common_causes": [
+        {
+          "cause": "External service not mocked",
+          "detection": "Check if test makes real HTTP requests",
+          "immediate_fix": "Skip test or increase timeout",
+          "proper_fix": "Mock external service with vi.mock() or msw",
+          "example": "vi.mock('@/lib/stripe', () => ({ createPayment: vi.fn() }));"
+        },
+        {
+          "cause": "Network timeout too long",
+          "detection": "Check fetch/axios timeout configuration",
+          "immediate_fix": "Set short timeout for test environment",
+          "proper_fix": "Always set reasonable timeouts for external calls",
+          "example": "fetch(url, { signal: AbortSignal.timeout(5000) })"
+        },
+        {
+          "cause": "DNS resolution failure",
+          "detection": "Check if service URL is resolvable",
+          "immediate_fix": "Use localhost or mock service",
+          "proper_fix": "Mock external services in tests",
+          "example": "process.env.EXTERNAL_API_URL = 'http://localhost:3001'"
+        }
+      ]
+    },
+    {
+      "pattern": "File I/O blocking",
+      "symptoms": [
+        "Test hangs on file read/write",
+        "Large file operations never complete",
+        "File system operations slow"
+      ],
+      "common_causes": [
+        {
+          "cause": "Large test file",
+          "detection": "Check file size being processed",
+          "immediate_fix": "Use smaller test file",
+          "proper_fix": "Use streaming for large files, reduce test data size",
+          "example": "Use 1KB test file instead of 100MB production file"
+        },
+        {
+          "cause": "File locked by another process",
+          "detection": "Check if file is open in multiple places",
+          "immediate_fix": "Close file handles in afterEach",
+          "proper_fix": "Use unique temp files per test",
+          "example": "const testFile = `/tmp/test-${nanoid()}.txt`"
+        },
+        {
+          "cause": "Synchronous file operations",
+          "detection": "Check for fs.readFileSync usage",
+          "immediate_fix": "Use smaller files",
+          "proper_fix": "Use async file operations (fs.promises)",
+          "example": "await fs.promises.readFile(path) instead of fs.readFileSync(path)"
+        }
+      ]
+    }
+  ],
+  "timeout_configurations": {
+    "vitest_defaults": {
+      "unit_test": 5000,
+      "integration_test": 10000,
+      "database_test": 30000,
+      "file_upload_test": 60000
+    },
+    "playwright_defaults": {
+      "action_timeout": 5000,
+      "navigation_timeout": 30000,
+      "test_timeout": 60000
+    },
+    "custom_timeout_examples": {
+      "single_test": "it('slow test', async () => { ... }, { timeout: 30000 });",
+      "test_suite": "describe.configure({ timeout: 30000 });",
+      "global": "vi.setConfig({ testTimeout: 30000 });"
+    }
+  },
+  "debugging_commands": [
+    {
+      "command": "EXPLAIN ANALYZE SELECT ...",
+      "purpose": "Analyze slow database queries",
+      "when": "Database query taking >1 second"
+    },
+    {
+      "command": "SELECT * FROM pg_locks;",
+      "purpose": "Check for database locks",
+      "when": "Query hangs indefinitely"
+    },
+    {
+      "command": "pnpm test --reporter=verbose",
+      "purpose": "See detailed test execution timing",
+      "when": "Identify which test is slow"
+    },
+    {
+      "command": "pnpm test --bail",
+      "purpose": "Stop on first timeout to debug",
+      "when": "Multiple tests timing out"
+    },
+    {
+      "command": "node --inspect-brk $(which vitest)",
+      "purpose": "Debug tests with Chrome DevTools",
+      "when": "Need to step through slow test code"
+    }
+  ],
+  "best_practices": [
+    "Set appropriate timeouts based on operation type (DB=30s, File=60s, Unit=5s)",
+    "Always add timeout guards to loops (max iterations or time limit)",
+    "Mock external services - never make real API calls in tests",
+    "Use database indexes on filtered/sorted columns",
+    "Prefer async operations over synchronous (especially file I/O)",
+    "Add LIMIT clauses to database queries in tests",
+    "Use unique test data IDs to avoid lock contention",
+    "Profile slow tests with --reporter=verbose",
+    "Increase timeout as immediate fix, optimize code as proper fix",
+    "Use AbortSignal.timeout() for fetch calls in test environment"
+  ],
+  "common_solutions_by_duration": {
+    "0-5_seconds": {
+      "verdict": "Normal for unit tests",
+      "action": "No action needed"
+    },
+    "5-10_seconds": {
+      "verdict": "Acceptable for integration tests",
+      "action": "Monitor, consider optimization"
+    },
+    "10-30_seconds": {
+      "verdict": "Slow, likely database or network I/O",
+      "action": "Add indexes, mock services, reduce test data"
+    },
+    "30+_seconds": {
+      "verdict": "Too slow, investigate immediately",
+      "action": "Check for missing indexes, infinite loops, unmocked external calls"
+    },
+    "timeout": {
+      "verdict": "Test will never complete",
+      "action": "Add logging, check for Promise resolution, verify loop conditions"
+    }
+  }
+}

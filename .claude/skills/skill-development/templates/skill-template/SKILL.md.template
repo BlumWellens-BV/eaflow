@@ -1,0 +1,189 @@
+---
+name: {skill-name}
+description: {What this skill does and when to use it. Must be ≥50 characters. Include trigger keywords.}
+version: 0.1.0
+status: beta
+
+# Integration (Numonic-specific)
+component: {web|desktop|worker|backend|packages|shared|skills}
+work-type: {DEMO|MVP|INFRASTRUCTURE|YAK|TECH-DEBT}
+business-value: {MOAT|SHARE|INTERNAL}
+revenue-impact: {PAID|FREE|NONE}
+
+# Capabilities
+allowed-tools: {Read, Write, Edit, Bash, Glob, Grep - customize based on needs}
+
+# Dependencies
+depends-on: [] # List other skills required, e.g., [gitlab-integration]
+conflicts-with: [] # List incompatible skills
+
+# Maintenance
+author: Numonic Team
+maintainer: team@numonic.ai
+created: {YYYY-MM-DD}
+updated: {YYYY-MM-DD}
+gitlab-issue: "{#123 or N/A}"
+---
+
+# {Skill Name}
+
+## Purpose
+
+{One paragraph describing what problem this skill solves. Be specific about the user/developer pain point.}
+
+**Problem Solved**: {Concise statement of the problem}
+
+## When to Use
+
+Activate this skill when you need to:
+
+- **{Use case 1}**: "{Example trigger phrase}"
+- **{Use case 2}**: "{Example trigger phrase}"
+- **{Use case 3}**: "{Example trigger phrase}"
+
+**Trigger keywords**: {keyword1}, {keyword2}, {keyword3}, {keyword4}
+
+## Instructions
+
+### Phase 1: {First Major Step}
+
+1. **{Substep 1}**
+   {Detailed instructions}
+   {Code blocks if needed}
+
+2. **{Substep 2}**
+   {Detailed instructions}
+
+### Phase 2: {Second Major Step}
+
+3. **{Substep 3}**
+   {Continue numbering across phases}
+
+4. **{Substep 4}**
+   {Be explicit and unambiguous}
+
+### Phase 3: {Final Step}
+
+5. **{Substep 5}**
+   {Include success criteria}
+
+## Examples
+
+**Example 1: {Basic Usage}**
+
+```
+User: "{Example user request}"
+
+Claude (using {skill-name}):
+1. {Step 1 action}
+2. {Step 2 action}
+3. {Step 3 action}
+
+Result: {What the user sees/gets}
+```
+
+**Example 2: {Advanced Usage}**
+
+```
+User: "{More complex request}"
+
+Claude (using {skill-name}):
+1. {Handles complexity}
+2. {Shows advanced features}
+3. {Delivers comprehensive result}
+
+Result: {Detailed output with all features}
+```
+
+## Quality Gates
+
+A successful execution requires:
+
+- [ ] {Success criterion 1}
+- [ ] {Success criterion 2}
+- [ ] {Success criterion 3}
+- [ ] {Success criterion 4}
+- [ ] {Success criterion 5}
+
+## Error Handling
+
+### Error: {Common Error 1}
+
+**Symptom**: {How user notices the error}
+
+**Solution**:
+1. {Fix step 1}
+2. {Fix step 2}
+3. {Fix step 3}
+
+### Error: {Common Error 2}
+
+**Symptom**: {Description}
+
+**Solution**:
+1. {Fix approach}
+
+### Error: {Common Error 3}
+
+**Symptom**: {Description}
+
+**Solution**:
+- {Quick fix or workaround}
+
+## Performance Considerations
+
+### Token Usage
+- **Activation**: ~{X} tokens (SKILL.md loaded)
+- **Per execution**: ~{Y} tokens
+- **Optimization**: {Any token-saving strategies}
+
+### Execution Time
+- **Typical case**: {X} seconds
+- **Complex case**: {Y} seconds
+- **Bottlenecks**: {Known slow operations}
+
+### Resource Constraints
+- **File system**: {Read/write requirements}
+- **Tools**: {Which tools used}
+- **Network**: {Required: yes/no}
+- **Supabase**: {Required: yes/no}
+- **GitLab**: {Required: yes/no}
+
+### Optimization Strategies
+1. {Strategy 1}
+2. {Strategy 2}
+
+## Related Skills
+
+### Dependencies
+- **{skill-name}**: {Why needed}
+
+### Composes Well With
+- **{skill-name}**: {How they work together}
+
+### Conflicts
+- **{skill-name}**: {Why incompatible}
+
+### Future Skills
+- **{planned-skill}**: {How it will extend this}
+
+## Best Practices
+
+1. **{Practice 1}**: {Explanation}
+2. **{Practice 2}**: {Explanation}
+3. **{Practice 3}**: {Explanation}
+
+## Maintenance
+
+### Updating This Skill
+1. {How to modify safely}
+2. {How to test changes}
+3. {How to version bump}
+
+### Known Issues
+- **Version {version}**: {Limitation description}
+- **Missing**: {Planned feature}
+
+### Roadmap
+- **v{next}**: {Planned improvements}
+- **v{future}**: {Long-term goals}
