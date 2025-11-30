@@ -22,21 +22,27 @@ Open EA Modeler is a git-native enterprise architecture modeling tool with a mod
 ```
 Web UI (React + React Flow)
     ↓
-Model Layer (TypeScript)
-  - Element Repository (all elements)
-  - Diagram Manager (views of model)
-  - Relationship Tracker (valid connections)
+Zustand Store (runtime state)
+  - elements, relationships, views
+  - CRUD actions with validation
     ↓
-Metamodel Engine
-  - Notation Plugins (ArchiMate, BPMN, etc.)
-  - Validation Rules
-  - Constraint Checker
+Services Layer
+  - Element/Relationship business logic
+  - Metamodel validation
     ↓
-Persistence Layer
+Persistence Layer (abstracted)
+  - ModelPersistence interface
   - JSON files (elements/, relationships/, views/)
   - Import/Export (ArchiMate OEF, SVG, PNG)
-  - Git integration
+    ↓
+Git Repository (source of truth)
 ```
+
+**Key architectural decisions** (see `docs/architecture/overview.md` for details):
+- Git-native JSON scales to ~10,000 elements before degradation
+- Thin persistence abstraction (`ModelPersistence` interface) enables future storage backends
+- Zustand is the runtime store; no database needed for MVP
+- DuckDB WASM can be added later as a derived query index (Phase 2)
 
 ## Technology Stack
 
@@ -58,6 +64,25 @@ pnpm build                # Build for production
 pnpm test                 # Run tests
 pnpm lint                 # Run ESLint
 pnpm format               # Run Prettier
+```
+
+## Source Directory Structure
+
+```
+packages/ui/src/
+├── persistence/
+│   ├── types.ts              # ModelPersistence interface
+│   ├── filesystem.ts         # LocalFilePersistence (MVP)
+│   └── index.ts              # Export active implementation
+├── store/
+│   ├── model-store.ts        # Zustand store (elements, relationships, views)
+│   └── ui-store.ts           # Selection, canvas state
+├── services/
+│   ├── element-service.ts    # Business logic, validation
+│   └── relationship-service.ts
+└── components/
+    ├── Canvas.tsx
+    └── panels/
 ```
 
 ## Code Style

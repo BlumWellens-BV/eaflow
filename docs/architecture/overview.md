@@ -618,6 +618,151 @@ ArchiMate defines 20+ viewpoints. For MVP, we support:
 
 ---
 
+## Scalability & Storage Architecture
+
+### Git-Native JSON: Feasibility Analysis
+
+The git-native approach stores models as JSON files in a repository. This section analyzes its viability at enterprise scale.
+
+#### File Size Estimates (Enterprise Scale)
+
+Using a reference scenario of a multi-entity group (e.g., holding company with 4 business entities across 12 domains):
+
+| Content | Elements | Est. Size/Element | File Size |
+|---------|----------|-------------------|-----------|
+| Business Actors | ~200 | ~500 bytes | ~100 KB |
+| Business Processes | ~400 | ~600 bytes | ~240 KB |
+| Application Components | ~300-500 | ~700 bytes | ~350 KB |
+| Relationships | ~2,000-5,000 | ~300 bytes | ~1.5 MB |
+| Views (each) | 20-80 nodes | ~200 bytes/node | ~5-20 KB |
+
+**Total for enterprise-scale model**: 3-8 MB of JSON across 20-50 files.
+
+#### Git Performance Thresholds
+
+| Model Scale | Elements | Relationships | Total JSON | Git Performance |
+|------------|----------|---------------|------------|-----------------|
+| Small org | ~500 | ~1,000 | <1 MB | Excellent |
+| Medium enterprise | ~2,000-3,000 | ~5,000-8,000 | 3-8 MB | Good |
+| Large enterprise | ~10,000 | ~25,000 | 15-30 MB | Acceptable |
+| Breaking point | ~50,000+ | ~100,000+ | 100+ MB | Degraded |
+
+**Conclusion**: Git handles enterprise-scale models well. The proposed file structure keeps individual files under 2 MB. Git's delta compression excels with JSON that changes incrementally.
+
+#### Where Git-Native Starts Breaking Down
+
+| Issue | Threshold | Symptom |
+|-------|-----------|---------|
+| Merge conflicts | 10+ concurrent editors on same file | Manual conflict resolution |
+| Clone time | 500+ MB repo (with history) | Minutes to clone |
+| Diff rendering | Single file >5 MB | Slow diffs in web UIs |
+| Search performance | 50,000+ elements | Slow grep-based search |
+
+### Query Capabilities
+
+Tools like Sparx EA provide SQL query capabilities for impact analysis, compliance reporting, and cross-referencing. The question: does a git-native tool need a database?
+
+#### Query Approaches Compared
+
+| Approach | Latency (3K elements) | Complexity | Queryability |
+|----------|----------------------|------------|--------------|
+| Load JSON into memory | <100ms | Low | JS filtering |
+| DuckDB (in-process WASM) | <50ms | Medium | Full SQL |
+| SQLite (sql.js in browser) | <50ms | Medium | Full SQL |
+| IndexedDB | <100ms | Medium | Limited queries |
+| Server DB (Supabase) | 50-200ms | High | Full SQL + realtime |
+
+#### Decision: Phased Approach
+
+Rather than over-engineering for uncertain future needs, we adopt a **thin persistence abstraction** that enables future evolution without requiring a rewrite:
+
+**Phase 1 (MVP)**: Pure JSON + Zustand in-memory store
+- Sufficient for enterprise-scale models (2,000-5,000 elements)
+- Fast CRUD operations via Zustand
+- Simple JS filtering for basic queries
+
+**Phase 2 (if needed)**: Add DuckDB WASM as query index
+- Runs entirely in browser (no server)
+- Rebuilds index from JSON on load (~50ms for 3,000 elements)
+- Full SQL for impact analysis, reporting
+- JSON remains source of truth
+
+**Phase 3 (if needed)**: Server database for collaboration
+- Only if multi-user realtime collaboration required
+- Adds significant complexity (conflicts, sync, auth)
+- Consider carefully — this is a different product
+
+### Runtime Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     Git Repository (source of truth)                 │
+│  elements/*.json  │  relationships/*.json  │  views/*.json          │
+└────────────────────────────────┬────────────────────────────────────┘
+                                 │
+                                 ▼ [load/save via ModelPersistence]
+┌─────────────────────────────────────────────────────────────────────┐
+│                   Persistence Layer (abstracted)                     │
+│  interface ModelPersistence {                                        │
+│    loadModel(path): Promise<Model>                                   │
+│    saveModel(path, model): Promise<void>                             │
+│    watchForChanges(path, callback): void                             │
+│  }                                                                   │
+└────────────────────────────────┬────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                   Zustand Store (runtime state)                      │
+│  - elements: Map<id, Element>                                        │
+│  - relationships: Map<id, Relationship>                              │
+│  - views: Map<id, View>                                              │
+│  - CRUD actions with validation                                      │
+└──────────────────────┬──────────────────────────────────────────────┘
+                       │
+         ┌─────────────┴─────────────┐
+         │                           │
+         ▼                           ▼ [Phase 2, derived]
+┌─────────────────────┐    ┌─────────────────────────────┐
+│   React Components  │    │   DuckDB WASM Query Index   │
+│   (UI binding)      │    │   - Rebuilt on load         │
+└─────────────────────┘    │   - SQL queries             │
+                           │   - Impact analysis         │
+                           └─────────────────────────────┘
+```
+
+### What We Abstract vs. What We Don't
+
+| Layer | Abstract? | Rationale |
+|-------|-----------|-----------|
+| **File I/O (ModelPersistence)** | Yes | Swapping filesystem → IndexedDB → cloud storage is realistic |
+| **In-memory state (Zustand)** | No | It's the right tool for React; DuckDB sits alongside, not replaces |
+| **Query interface** | No (yet) | Don't build generic query abstraction until real requirements exist |
+
+### Source Directory Structure
+
+```
+src/
+├── persistence/
+│   ├── types.ts              # ModelPersistence interface
+│   ├── filesystem.ts         # LocalFilePersistence (MVP)
+│   └── index.ts              # Export active implementation
+│
+├── store/
+│   ├── model-store.ts        # Zustand store (elements, relationships, views)
+│   └── ui-store.ts           # Selection, canvas state, etc.
+│
+├── services/
+│   ├── element-service.ts    # Business logic (validation, CRUD)
+│   └── relationship-service.ts
+│
+└── [Phase 2]
+    └── query/
+        ├── duckdb-index.ts   # Build index from model
+        └── query-service.ts  # SQL query execution
+```
+
+---
+
 ## Libraries to Leverage
 
 ### Existing ArchiMate Work
